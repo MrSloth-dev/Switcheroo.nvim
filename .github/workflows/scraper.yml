@@ -23,36 +23,33 @@ jobs:
       - name: Scrape themes
         run: |
           cat > scrape.py << 'EOF'
-           from bs4 import BeautifulSoup
-           import requests
-           import re
+          from bs4 import BeautifulSoup
+          import requests
+          import re
 
-           def scrape_themes():
-               url = "https://dotfyle.com/neovim/colorscheme/top"
-               response = requests.get(url)
-               soup = BeautifulSoup(response.text, 'html.parser')
+          def scrape_themes():
+          url = "https://dotfyle.com/neovim/colorscheme/top"
+          response = requests.get(url)
+          soup = BeautifulSoup(response.text, 'html.parser')
+          plugin_links = soup.find_all("a", href=re.compile(r"^/plugins/"))
+          with open("themes.lua", "w") as file:
+              for link in plugin_links:
+                  file.write("\"")
+                  file.write(link.get("href").replace("/plugins/", ""))
+                  file.write("\"\n")
+          url = "https://dotfyle.com/neovim/colorscheme/top?page=2"
+          response = requests.get(url)
+          soup = BeautifulSoup(response.text, 'html.parser')
 
-               plugin_links = soup.find_all("a", href=re.compile(r"^/plugins/"))
-               with open("themes.lua", "w") as file:
-           for link in plugin_links:
-           file.write("\"")
-           file.write(link.get("href").replace("/plugins/", ""))
-           file.write("\"\n")
-           url = "https://dotfyle.com/neovim/colorscheme/top?page=2"
-           response = requests.get(url)
-           soup = BeautifulSoup(response.text, 'html.parser')
+          plugin_links = soup.find_all("a", href=re.compile(r"^/plugins/"))
+          with open("themes.lua", "a") as file:
+              for link in plugin_links:
+                  file.write("\"")
+                  file.write(link.get("href").replace("/plugins/", ""))
+                  file.write("\"\n")
 
-           plugin_links = soup.find_all("a", href=re.compile(r"^/plugins/"))
-           with open("themes.lua", "a") as file:
-           for link in plugin_links:
-           file.write("\"")
-           file.write(link.get("href").replace("/plugins/", ""))
-           file.write("\"\n")
-           # Convert to Lua table format
-           exit
-
-           if __name__ == "__main__":
-           themes = scrape_themes()
+          if __name__ == "__main__":
+          themes = scrape_themes()
           EOF
 
           python scrape.py
