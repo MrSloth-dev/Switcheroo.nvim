@@ -78,3 +78,5 @@ jobs:
           git config user.email "joao8barbosa@gmail.com"
           git config user.name "GitHub Action"
           git add themes.json themes.lua
+          git commit -m "Github Action"
+          git push
