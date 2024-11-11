@@ -7,10 +7,9 @@ local finders = require("telescope.finders")
 local previewers = require("telescope.previewers")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
-
 local show_preview = true
--- for fast dev
-vim.keymap.set("n", "<leader>r", ":so<CR>")
+
+vim.keymap.set("n", "<leader>r", ":so<CR>") -- for fast dev
 
 local preview_code = {
 	"local function example()",
@@ -31,9 +30,27 @@ local preview_code = {
 	"        return self.value * 2",
 }
 
+local function load_plugins_from_file(filename)
+	local plugins = {}
+	local content = vim.fn.readfile(filename)
+	if not content then
+		print("")
+	end
+	for _, line in ipairs(content) do
+		if line ~= "" then
+			table.insert(plugins, line)
+		end
+	end
+	return plugins
+end
+
+local plugin_list = load_plugins_from_file("/themes.lua")
 M.select_theme = function(opts)
 	opts = opts or {}
-	local themes = vim.fn.getcompletion("", "color")
+	-- local themes = vim.fn.getcompletion("", "color")
+	local themes = vim.tbl_map(function(plugin)
+		return plugin:match("([^/]+)$")
+	end, plugin_list)
 	local initial_colorscheme = vim.g.colors_name
 	pickers
 		.new(opts, {
