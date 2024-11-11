@@ -1,0 +1,81 @@
+name: Scrape Neovim Themes
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 PyYAML
+          
+      - name: Scrape themes
+        run: |
+          cat > scrape.py << 'EOF'
+          import requests
+          from bs4 import BeautifulSoup
+          import yaml
+          import json
+          
+          def scrape_themes():
+              url = "https://dotfyle.com/neovim/colorscheme/top"
+              response = requests.get(url)
+              soup = BeautifulSoup(response.text, 'html.parser')
+              
+              themes = []
+              # Adjust these selectors based on the actual website structure
+              for theme in soup.select('.theme-card'):  # Update selector as needed
+                  try:
+                      name = theme.select_one('.theme-name').text.strip()
+                      github_url = theme.select_one('a[href*="github.com"]')['href']
+                      stars = theme.select_one('.stars').text.strip()
+                      
+                      themes.append({
+                          'name': name,
+                          'url': github_url,
+                          'stars': stars,
+                      })
+                  except (AttributeError, KeyError) as e:
+                      print(f"Error processing theme: {e}")
+                      continue
+              
+              return themes
+          
+          def save_themes(themes):
+              # Save as JSON for easy parsing
+              with open('themes.json', 'w') as f:
+                  json.dump(themes, f, indent=2)
+              
+              # Also save as Lua table for direct Neovim usage
+              lua_content = 'return {\n'
+              for theme in themes:
+                  lua_content += f'  {{\n    name = "{theme["name"]}",\n    url = "{theme["url"]}",\n    stars = "{theme["stars"]}"\n  }},\n'
+              lua_content += '}\n'
+              
+              with open('themes.lua', 'w') as f:
+                  f.write(lua_content)
+          
+          if __name__ == "__main__":
+              themes = scrape_themes()
+              save_themes(themes)
+          EOF
+          
+          python scrape.py
+          
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add themes.json themes.lua
+          git diff -
