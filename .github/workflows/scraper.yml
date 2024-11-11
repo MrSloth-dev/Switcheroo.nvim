@@ -75,7 +75,6 @@ jobs:
           
       - name: Commit and push if changed
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config user.email "joao8barbosa@gmail.com"
+          git config user.name "GitHub Action"
           git add themes.json themes.lua
-          git diff -
