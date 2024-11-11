@@ -30,27 +30,27 @@ local preview_code = {
 	"        return self.value * 2",
 }
 
-local function load_plugins_from_file(filename)
-	local plugins = {}
-	local content = vim.fn.readfile(filename)
-	if not content then
-		print("")
-	end
-	for _, line in ipairs(content) do
-		if line ~= "" then
-			table.insert(plugins, line)
-		end
-	end
-	return plugins
-end
+-- local function load_plugins_from_file(filename)
+-- 	local plugins = {}
+-- 	local content = vim.fn.readfile(filename)
+-- 	if not content then
+-- 		print("")
+-- 	end
+-- 	for _, line in ipairs(content) do
+-- 		if line ~= "" then
+-- 			table.insert(plugins, line)
+-- 		end
+-- 	end
+-- 	return plugins
+-- end
 
-local plugin_list = load_plugins_from_file("/themes.lua")
+-- local plugin_list = load_plugins_from_file("/themes.lua")
 M.select_theme = function(opts)
 	opts = opts or {}
-	-- local themes = vim.fn.getcompletion("", "color")
-	local themes = vim.tbl_map(function(plugin)
-		return plugin:match("([^/]+)$")
-	end, plugin_list)
+	local themes = vim.fn.getcompletion("", "color")
+	-- local themes = vim.tbl_map(function(plugin)
+	-- 	return plugin:match("([^/]+)$")
+	-- end, plugin_list)
 	local initial_colorscheme = vim.g.colors_name
 	pickers
 		.new(opts, {
