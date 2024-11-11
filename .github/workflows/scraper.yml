@@ -23,61 +23,45 @@ jobs:
       - name: Scrape themes
         run: |
           cat > scrape.py << 'EOF'
-          import requests
-          from bs4 import BeautifulSoup
-          import yaml
-          import json
-          
-          def scrape_themes():
-              url = "https://dotfyle.com/neovim/colorscheme/top"
-              response = requests.get(url)
-              soup = BeautifulSoup(response.text, 'html.parser')
-              
-              themes = []
-              # Adjust these selectors based on the actual website structure
-              for theme in soup.select('.theme-card'):  # Update selector as needed
-                  try:
-                      name = theme.select_one('.theme-name').text.strip()
-                      github_url = theme.select_one('a[href*="github.com"]')['href']
-                      stars = theme.select_one('.stars').text.strip()
-                      
-                      themes.append({
-                          'name': name,
-                          'url': github_url,
-                          'stars': stars,
-                      })
-                  except (AttributeError, KeyError) as e:
-                      print(f"Error processing theme: {e}")
-                      continue
-              
-              return themes
-          
-          def save_themes(themes):
-              # Save as JSON for easy parsing
-              with open('themes.json', 'w') as f:
-                  json.dump(themes, f, indent=2)
-              
-              # Also save as Lua table for direct Neovim usage
-              lua_content = 'return {\n'
-              for theme in themes:
-                  lua_content += f'  {{\n    name = "{theme["name"]}",\n    url = "{theme["url"]}",\n    stars = "{theme["stars"]}"\n  }},\n'
-              lua_content += '}\n'
-              
-              with open('themes.lua', 'w') as f:
-                  f.write(lua_content)
-          
-          if __name__ == "__main__":
-              themes = scrape_themes()
-              save_themes(themes)
+           from bs4 import BeautifulSoup
+           import requests
+           import re
+
+           def scrape_themes():
+               url = "https://dotfyle.com/neovim/colorscheme/top"
+               response = requests.get(url)
+               soup = BeautifulSoup(response.text, 'html.parser')
+
+               plugin_links = soup.find_all("a", href=re.compile(r"^/plugins/"))
+               with open("themes.lua", "w") as file:
+           for link in plugin_links:
+           file.write("\"")
+           file.write(link.get("href").replace("/plugins/", ""))
+           file.write("\"\n")
+           url = "https://dotfyle.com/neovim/colorscheme/top?page=2"
+           response = requests.get(url)
+           soup = BeautifulSoup(response.text, 'html.parser')
+
+           plugin_links = soup.find_all("a", href=re.compile(r"^/plugins/"))
+           with open("themes.lua", "a") as file:
+           for link in plugin_links:
+           file.write("\"")
+           file.write(link.get("href").replace("/plugins/", ""))
+           file.write("\"\n")
+           # Convert to Lua table format
+           exit
+
+           if __name__ == "__main__":
+           themes = scrape_themes()
           EOF
-          
+
           python scrape.py
-          
+
       - name: Commit and push if changed
         run: |
           git config user.email "joao8barbosa@gmail.com"
           git config user.name "GitHub Action"
-          git add themes.json themes.lua
+          git add themes.lua
           if ! git diff --cached --quiet; then
             git commit -m "Update themes from GitHub Action"
             git push
