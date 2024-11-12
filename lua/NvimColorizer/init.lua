@@ -30,6 +30,16 @@ local preview_code = {
 	"        return self.value * 2",
 }
 
+local function load_themes()
+	local ok, themes = pcall(require, "./theme_list")
+	if not ok then
+		vim.notify("Could not load Theme List", vim.log.levels.ERROR)
+		return {}
+	else
+		return themes
+	end
+end
+
 -- local function load_plugins_from_file(filename)
 -- 	local plugins = {}
 -- 	local content = vim.fn.readfile(filename)
@@ -43,11 +53,15 @@ local preview_code = {
 -- 	end
 -- 	return plugins
 -- end
-
--- local plugin_list = load_plugins_from_file("/themes.lua")
+--
+-- local plugin_list = load_plugins_from_file("./theme_list.lua")
 M.select_theme = function(opts)
 	opts = opts or {}
-	local themes = vim.fn.getcompletion("", "color")
+	-- local themes = vim.fn.getcompletion("", "color")
+	local themes = load_themes()
+	local theme_names = vim.tbl_map(function(theme)
+		return theme.name
+	end, themes)
 	-- local themes = vim.tbl_map(function(plugin)
 	-- 	return plugin:match("([^/]+)$")
 	-- end, plugin_list)
