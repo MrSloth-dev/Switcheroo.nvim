@@ -43,7 +43,6 @@ def extract_colorscheme_links(markdown_content):
                 })
             except ValueError:
                 continue
-    
     return results
 
 def generate_lua_file(themes):
@@ -64,7 +63,7 @@ def main():
         markdown_content = fetch_raw_markdown()
         links = extract_colorscheme_links(markdown_content)
         lua_content = generate_lua_file(links)
-        
+
         with open("theme_list.lua", "w", encoding='utf-8') as file:
             file.write(lua_content)
 
@@ -75,7 +74,7 @@ def main():
             if link['description']:
                 print(f"Description: {link['description']}")
             print()
-            
+
     except requests.RequestException as e:
         print(f"Error fetching markdown: {e}")
     except Exception as e:

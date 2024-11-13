@@ -51,7 +51,7 @@ To report a bug or ask for a feature, please open a [Github issue](https://githu
 
 ## Roadmap
 
-- [ ] Get Top and new colorschemes from [Dotfyle.com](www.dotfyle.com)
+- [ ] Get colorschemes from [awesome-neovim repo](https://github.com/rockerBOO/awesome-neovim)
 - [ ] Improve performance and minimize errors
 - [ ] Get multiple code snippets in different languages
 - [ ] Create a file with the choosen colorscheme with the link for the origin repo. For more costumization
