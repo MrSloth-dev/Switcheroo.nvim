@@ -2,7 +2,6 @@
 This plugin allows to switch your colorscheme and make a quick preview with a code snippet.
 What differentiates this plugin from other is that it sources every month the colorschemes on [Awesome-neovim](https://github.com/rockerBOO/awesome-neovim) (Currently not working).
 
-<br>
 ## Install
 
 <details>
