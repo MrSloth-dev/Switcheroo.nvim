@@ -1,6 +1,7 @@
 # Switcheroo - A simple colorscheme switcher
 This plugin allows to switch your colorscheme and make a quick preview with a code snippet.
-What differentiates this plugin from other is that it sources every month the colorschemes on [Awesome-neovim](https://github.com/rockerBOO/awesome-neovim) (Currently not working).
+What differentiates this plugin from other is that it sources every month the colorschemes on [Awesome-neovim](https://github.com/rockerBOO/awesome-neovim) 
+## Note that this is in early stages and it can break.
 
 ## Install
 
