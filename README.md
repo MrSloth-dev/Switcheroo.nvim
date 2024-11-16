@@ -11,7 +11,7 @@ What differentiates this plugin from other is that it sources every month the co
 ``` lua
 {
     "MrSloth-dev/Switcheroo.nvim",
-    requires = { "rktjmp/lush.nvim", "nvim-telescope/telescope.nvim" },
+    dependencies = { "rktjmp/lush.nvim", "nvim-telescope/telescope.nvim" },
     opts = {}
 },
 ```
