@@ -162,7 +162,8 @@ I know it's ugly but I'm working on this to make it work.
 ```
 </details>
 
-As you can see, this is an exatensive list of colorscheme from awesome-neovim [repo](https://github.com/rockerBOO/awesome-neovim), be sure to visit it for even more plugins beside of colorschemes.
+As you can see, this is an extensive list of colorscheme from awesome-neovim [repo](https://github.com/rockerBOO/awesome-neovim), be sure to visit it for even more plugins beside of colorschemes.
+
 ## Known Issues
 
 - Some colorschemes can have issues that I cannot control. Open a [Github issue](https://github.com/MrSloth-dev/42-NorminetteNvim/issues/new) so that I can look into it.
