@@ -1,17 +1,6 @@
 local M = {}
-M.version = "0.1"
-
 M.dependencies = { "rktjmp/lush.nvim", "nvim-telescope/telescope.nvim" }
-
-local has_telescope = pcall(require, "telescope")
-if not has_telescope then
-	error("This Plugin requires telescope.nvim.")
-end
-
-local has_lush = pcall(require, "lush")
-if not has_lush then
-	error("Some colorschemes requires lush.nvim. Please install it to use this plugin.")
-end
+M.version = "0.2"
 
 local pickers = require("telescope.pickers")
 local sorters = require("telescope.sorters")
@@ -19,41 +8,42 @@ local finders = require("telescope.finders")
 local previewers = require("telescope.previewers")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
+local filesystem = require("Switcheroo.filesystem")
 M.show_preview = true
 
--- local function install_all_themes()
--- 	local lazy_ok, lazy = pcall(require, "lazy")
--- 	if not lazy_ok then
--- 		vim.notify(
--- 			"Lazy.nvim not installed. Please install lazy.nvim or install the themes manually",
--- 			vim.log.levels.WARN
--- 		)
--- 		return {}
--- 	end
--- 	local theme_specs = require("theme_list")
--- 	for _, theme_spec in ipairs(theme_specs) do
--- 		if theme_spec.spec then
--- 			lazy.install({ spec = theme_spec.name, priority = 1000, show = false, wait = false })
--- 		end
--- 	end
--- end
+local function CheckTheme()
+	if not filesystem.path then
+		filesystem.CreateDir()
+		return
+	end
+	local file = io.open(filesystem.file, "r")
+	if not file then
+		file = io.open(filesystem.file, "w")
+		if not file then
+			error("Error config")
+		end
+	end
+	local colorscheme = file:read()
+	if colorscheme then
+		if pcall(vim.cmd.colorscheme, colorscheme) then
+			vim.cmd("colorscheme " .. colorscheme)
+		else
+			vim.notify("Colorscheme " .. colorscheme .. " not found! Falling back to default.", vim.log.levels.WARN)
+		end
+	end
+	file:close()
+end
 
--- local function uninstall_unused_themes()
--- 	local lazy_ok, lazy = pcall(require, "lazy")
--- 	if not lazy_ok then
--- 		vim.notify(
--- 			"Lazy.nvim not installed. Please install lazy.nvim or install the themes manually",
--- 			vim.log.levels.WARN
--- 		)
--- 		return {}
--- 	end
--- 	local theme_specs = {}
--- 	for _, theme_spec in ipairs(theme_specs) do
--- 		if theme_spec.spec then
--- 			-- lazy.clean({ spec = theme_spec, show = false })
--- 		end
--- 	end
--- end
+local has_lush = pcall(require, "lush")
+if not has_lush then
+	vim.notify("Some colorschemes requires lush.nvim. Please install it to use this plugin.", vim.log.levels.ERROR)
+end
+
+--Check and init telescope
+local has_telescope = pcall(require, "telescope")
+if not has_telescope then
+	error("This Plugin requires telescope.nvim.")
+end
 
 local preview_code = {
 	"local function example(input_list)",
@@ -94,7 +84,6 @@ end
 local function attach_map(map, prompt_bufnr, initial_colorscheme)
 	local function reset_colorscheme()
 		vim.cmd("colorscheme " .. initial_colorscheme)
-		-- uninstall_unused_themes()
 		actions.close(prompt_bufnr)
 	end
 	map("i", "<C-c>", function()
@@ -109,7 +98,6 @@ local function attach_map(map, prompt_bufnr, initial_colorscheme)
 end
 
 M.select_theme = function(opts)
-	-- install_all_themes()
 	local themes = get_avaiable_colorschemes()
 	local initial_colorscheme = vim.g.colors_name
 
@@ -129,10 +117,9 @@ M.select_theme = function(opts)
 				end,
 			}),
 			sorter = sorters.get_fzy_sorter(opts),
-			previewer = M.show_preview and previewers.new_buffer_previewer({
+			previewer = previewers.new_buffer_previewer({
 				define_preview = function(self, entry)
 					local bufnr = self.state.bufnr
-					print(entry.value)
 					local preview_content = {
 						"Current Theme: " .. entry.value,
 						"_____________________",
@@ -150,8 +137,12 @@ M.select_theme = function(opts)
 				local function apply_colorscheme()
 					local selection = action_state.get_selected_entry()
 					if selection then
+						local file = io.open(filesystem.file, "w")
+						if file then
+							file:write(selection.value)
+							file:close()
+						end
 						vim.cmd("colorscheme " .. selection.value)
-						-- uninstall_unused_themes()
 					end
 				end
 				actions.select_default:replace(function()
@@ -164,18 +155,16 @@ M.select_theme = function(opts)
 		})
 		:find()
 end
-
 function M.setup(opts)
 	opts = opts or {}
-	local defaults_opts = {
-		show_preview = true,
-	}
+	local defaults_opts = {}
 	for key, value in pairs(defaults_opts) do
 		if opts[key] == nil then
 			opts[key] = value
 		end
 	end
 	M.show_preview = opts.show_preview
+	CheckTheme()
 	vim.api.nvim_create_user_command("Switcheroo", function()
 		M.select_theme(opts)
 	end, {})
