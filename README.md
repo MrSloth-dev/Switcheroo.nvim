@@ -2,7 +2,7 @@
 
 ### Ever wanted to try new colorschemes but the search, clone, install and update cycle is too boring?
 <br>
-<img src="https://github.com/MrSloth-dev/Switcheroo.nvim/blob/main/Showcase.gif?raw=true" alt="Showcase" width="1000" height="600">
+<img src="https://github.com/MrSloth-dev/Switcheroo.nvim/blob/main/Showcase.gif?raw=true" alt="Showcase" width="1000" height="500">
 <br>
 This plugin allows to switch your colorscheme and make a quick preview with a code snippet.
 What differentiates this plugin from other is that it sources every month the colorschemes on [Awesome-neovim](https://github.com/rockerBOO/awesome-neovim) to access 100+ colorschemes!
